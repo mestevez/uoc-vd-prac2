@@ -120,7 +120,7 @@
 
             const sequence = (length) => Array.apply(null, {length: length}).map((d, i) => i);
 
-            const color = d3.scaleOrdinal(d3.schemeCategory10)
+            const color = d3.scaleOrdinal(d3.schemeCategory20)
                 .domain(sequence(data.length))
 
             const scale = d3.scaleBand()
