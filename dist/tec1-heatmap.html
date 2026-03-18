@@ -1,20 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VD PAC2 (Heatmap)</title>
     <script src="./assets/lib/d3.v4.js"></script>
-
-    <style>
-        .tooltip {
-            position: absolute;
-            border: 1px solid #C0C0C0;
-            border-radius: 5px;
-            background: white;
-            padding: .5em;
-            font-size: .8rem;
-        }
-    </style>
+    <script src="./assets/lib/tailwindcss.3.4.17.js"></script>
+    <link href="./assets/lib/styles/daisyui.4.12.24.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="./assets/styles/shared.css">
 
     <script>
         function preparedData(data, myGroups, myGroupsNames, myVars) {
@@ -45,12 +38,10 @@
         }
 
         function buildHeatMap(opts, { data, myGroups, myVars, domain }) {
-            // set the dimensions and margins of the graph
             var margin = {top: 80, right: 30, bottom: 30, left: 30},
                 width = opts.width - margin.left - margin.right,
                 height = opts.height - margin.top - margin.bottom;
 
-            // append the svg object to the body of the page
             var svg = d3.select(opts.el)
                 .append("svg")
                 .attr("width", width + margin.left + margin.right)
@@ -58,122 +49,117 @@
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            // Build X scales and axis:
-            var x = d3.scaleBand()
-                .range([ 0, width ])
-                .domain(myGroups)
-                .padding(0.01);
-            svg.append("g")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x))
+            var x = d3.scaleBand().range([0, width]).domain(myGroups).padding(0.01);
+            svg.append("g").attr("transform", "translate(0," + height + ")").call(d3.axisBottom(x));
 
-            // Build X scales and axis:
-            var y = d3.scaleBand()
-                .range([ height, 0 ])
-                .domain(myVars)
-                .padding(0.01);
-            svg.append("g")
-                .call(d3.axisLeft(y));
+            var y = d3.scaleBand().range([height, 0]).domain(myVars).padding(0.01);
+            svg.append("g").call(d3.axisLeft(y));
 
-            // Build color scale
-            var myColor = d3.scaleLinear()
-                .range(["white", opts.color])
-                .domain([0,domain])
+            var myColor = d3.scaleLinear().range(["white", opts.color]).domain([0, domain]);
 
-            // create a tooltip
+            // tooltip — uses .d3-tooltip from shared.css
             var tooltip = d3.select(opts.el)
                 .append("div")
                 .style("opacity", 0)
-                .attr("class", "tooltip")
+                .attr("class", "d3-tooltip");
 
-            // Three function that change the tooltip when user hover / move / leave a cell
             var mouseover = function(d) {
-                tooltip
-                    .style("opacity", 1)
-                d3.select(this)
-                    .style("stroke", "black")
-                    .style("opacity", 1)
-            }
+                tooltip.style("opacity", 1);
+                d3.select(this).style("stroke", "black").style("opacity", 1);
+            };
             var mousemove = function(d) {
                 tooltip
                     .html("Accidents registrats: " + d.value)
-                    .style("left", (d3.mouse(this)[0]+70) + "px")
-                    .style("top", (d3.mouse(this)[1]+margin.top+30) + "px")
-            }
+                    .style("left", (d3.mouse(this)[0] + 70) + "px")
+                    .style("top", (d3.mouse(this)[1] + margin.top + 30) + "px");
+            };
             var mouseleave = function(d) {
-                tooltip
-                    .style("opacity", 0)
-                d3.select(this)
-                    .style("stroke", "none")
-                    .style("opacity", 0.8)
-            }
+                tooltip.style("opacity", 0);
+                d3.select(this).style("stroke", "none").style("opacity", 0.8);
+            };
 
-            // Add title to graph
-            svg.append("text")
-                .attr("x", 0)
-                .attr("y", -50)
-                .attr("text-anchor", "left")
-                .style("font-size", "22px")
-                .text(opts.title);
-
-            // Add subtitle to graph
-            svg.append("text")
-                .attr("x", 0)
-                .attr("y", -20)
-                .attr("text-anchor", "left")
-                .style("font-size", "14px")
-                .style("fill", "grey")
-                .style("max-width", opts.width)
-                .text(opts.subtitle);
+            svg.append("text").attr("x", 0).attr("y", -50).attr("text-anchor", "left")
+                .style("font-size", "22px").text(opts.title);
+            svg.append("text").attr("x", 0).attr("y", -20).attr("text-anchor", "left")
+                .style("font-size", "14px").style("fill", "grey").text(opts.subtitle);
 
             svg.selectAll()
-                .data(data, function (d) {
-                    return d.group + ':' + d.variable;
-                })
-                .enter()
-                .append("rect")
-                .attr("x", function (d) {
-                    return x(d.group)
-                })
-                .attr("y", function (d) {
-                    return y(d.variable)
-                })
-                .attr("width", x.bandwidth())
-                .attr("height", y.bandwidth())
-                .style("fill", function (d) {
-                    return myColor(d.value)
-                })
+                .data(data, function(d) { return d.group + ':' + d.variable; })
+                .enter().append("rect")
+                .attr("x", function(d) { return x(d.group); })
+                .attr("y", function(d) { return y(d.variable); })
+                .attr("width", x.bandwidth()).attr("height", y.bandwidth())
+                .style("fill", function(d) { return myColor(d.value); })
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
-                .on("mouseleave", mouseleave)
+                .on("mouseleave", mouseleave);
+        }
+
+        function getChartSize() {
+            const host = document.querySelector("#my_dataviz");
+            const hostWidth = host ? host.clientWidth : 600;
+            const width = Math.max(380, Math.min(720, hostWidth - 16));
+            const height = Math.round(width * 1.15);
+            return { width, height };
+        }
+
+        function updateGraph(prepData) {
+            document.querySelector("#my_dataviz").innerHTML = "";
+            const { width, height } = getChartSize();
+            buildHeatMap(
+                {
+                    el: '#my_dataviz',
+                    color: "#4285f4",
+                    width,
+                    height,
+                    title: "Accidents per hora i dia de la setmana",
+                    subtitle: "Accidents registrats a Barcelona per la Guardia Urbana (2010 - 2021)"
+                },
+                prepData
+            );
         }
     </script>
 </head>
-<body>
-    <a href="index.html">Tornar a l'índex</a>
-    <h1>TÈCNICA GRUP I (Bàsiques i populars): 116- Heatmap</h1>
-    <div id="my_dataviz"></div>
+<body class="min-h-screen bg-base-200 text-base-content" data-theme="corporate">
 
-<script>
-    d3.csv('./assets/data/accidents_opendata.csv', function(data) {
-        var myGroups = ["Dl", "Dm", "Dc", "Dj", "Dv", "Ds", "Dg"];
-        var myGroupsNames = ["Dilluns", "Dimarts", "Dimecres", "Dijous", "Divendres", "Dissabte", "Diumenge"];
-        var myVars =  ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
-        var prepData = preparedData(data, myGroups, myGroupsNames, myVars);
+    <div class="navbar bg-base-100 shadow-sm px-4 md:px-8">
+        <div class="flex-1">
+            <a class="btn btn-ghost text-lg" href="index.html">← Tornar a l'índex</a>
+        </div>
+        <div class="flex-none">
+            <span class="badge badge-primary badge-lg">PAC2 · D3 + Tailwind + DaisyUI</span>
+        </div>
+    </div>
 
-        buildHeatMap(
-            {
-                el: '#my_dataviz',
-                color: "#4285f4",
-                width: 500,
-                height: 500,
-                title: "Accidents per hora i dia de la setmana",
-                subtitle: "Accidents registrats a Barcelona per la Guardia Urbana (2010 - 2021)"
-            },
-            prepData
-        );
-    });
+    <main class="mx-auto max-w-5xl p-4 md:p-8 space-y-6">
 
-</script>
+        <section class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h1 class="card-title text-2xl md:text-3xl">TÈCNICA GRUP I: Heatmap</h1>
+                <p class="text-base-content/70">Distribució d'accidents registrats a Barcelona per hora del dia i dia de la setmana (2010 - 2021).</p>
+            </div>
+        </section>
+
+        <section class="card bg-base-100 shadow">
+            <div class="card-body">
+                <div id="my_dataviz" class="w-full overflow-x-auto"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        var storedPrepData = null;
+
+        d3.csv('./assets/data/accidents_opendata.csv', function(data) {
+            var myGroups = ["Dl", "Dm", "Dc", "Dj", "Dv", "Ds", "Dg"];
+            var myGroupsNames = ["Dilluns", "Dimarts", "Dimecres", "Dijous", "Divendres", "Dissabte", "Diumenge"];
+            var myVars = ["00","01","02","03","04","05","06","07","08","09","10","11","12","13","14","15","16","17","18","19","20","21","22","23"];
+            storedPrepData = preparedData(data, myGroups, myGroupsNames, myVars);
+            updateGraph(storedPrepData);
+
+            window.addEventListener("resize", () => updateGraph(storedPrepData));
+        });
+    </script>
 </body>
 </html>

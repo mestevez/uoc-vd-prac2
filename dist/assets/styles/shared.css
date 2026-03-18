@@ -1,0 +1,32 @@
+/* ── Shared styles · UOC VD PAC2 ── */
+
+/* D3 chart container: needs position:relative for absolute-positioned tooltips */
+#my_dataviz {
+    position: relative;
+}
+
+/* ── D3 tooltip (tec1-heatmap) ── */
+.d3-tooltip {
+    position: absolute;
+    border: 1px solid #C0C0C0;
+    border-radius: 5px;
+    background: white;
+    padding: .5em;
+    font-size: .8rem;
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* ── Bullet chart SVG styles (tec3-bullet) ── */
+.bullet { font: 10px sans-serif; }
+.bullet .marker { stroke: #263238; stroke-width: 2px; }
+.bullet .tick line { stroke: #666; stroke-width: .5px; }
+.bullet .range.s0 { fill: #e7e9ec; }
+.bullet .range.s1 { fill: #ddd; }
+.bullet .range.s2 { fill: #ccd1d6; }
+.bullet .range.s3 { fill: #acb4bc; }
+.bullet .measure.s0 { fill: #b0a2e4; }
+.bullet .measure.s1 { fill: #855cf8; }
+.bullet .title { font-size: 14px; font-weight: bold; }
+.bullet .subtitle { fill: #999; }
+

@@ -1,24 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VD PAC2 (Bullet)</title>
     <script src="./assets/lib/d3.v4.js"></script>
     <script src="./assets/lib/bullet.js"></script>
-
-    <style>
-        .bullet { font: 10px sans-serif; }
-        .bullet .marker { stroke: #263238; stroke-width: 2px; }
-        .bullet .tick line { stroke: #666; stroke-width: .5px; }
-        .bullet .range.s0 { fill: #e7e9ec; }
-        .bullet .range.s1 { fill: #ddd; }
-        .bullet .range.s2 { fill: #ccd1d6; }
-        .bullet .range.s3 { fill: #acb4bc; }
-        .bullet .measure.s0 { fill: #b0a2e4; }
-        .bullet .measure.s1 { fill: #855cf8; }
-        .bullet .title { font-size: 14px; font-weight: bold; }
-        .bullet .subtitle { fill: #999; }
-    </style>
+    <script src="./assets/lib/tailwindcss.3.4.17.js"></script>
+    <link href="./assets/lib/styles/daisyui.4.12.24.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="./assets/styles/shared.css">
 
     <script>
         function preparedData(data, year, extract) {
@@ -39,34 +29,32 @@
 
             for (let extractData in extract) {
                 const column = extract[extractData].column;
-
                 const maxValue = yearsList.reduce((accu, curr) => Math.max(accu, yearValues[curr][column]), 0);
                 const avgValue = yearsList.reduce((accu, curr) => accu + yearValues[curr][column], 0) / yearsList.length;
-                const q1 = yearsList.reduce((accu, curr) => accu.concat(yearValues[curr][column]), []).sort((a, b) => a - b)[Math.floor(yearsList.length * 0.25)];
-                const median = yearsList.reduce((accu, curr) => accu.concat(yearValues[curr][column]), []).sort((a, b) => a - b)[Math.floor(yearsList.length * 0.5)];
-                const q3 = yearsList.reduce((accu, curr) => accu.concat(yearValues[curr][column]), []).sort((a, b) => a - b)[Math.floor(yearsList.length * 0.75)];
-                const value = data.filter(d => d['year'] === String(year)).reduce((accu, curr) => accu + Number(curr[column]), 0);
+                const sorted = yearsList.reduce((accu, curr) => accu.concat(yearValues[curr][column]), []).sort((a, b) => a - b);
+                const q1     = sorted[Math.floor(yearsList.length * 0.25)];
+                const median = sorted[Math.floor(yearsList.length * 0.5)];
+                const q3     = sorted[Math.floor(yearsList.length * 0.75)];
+                const value  = data.filter(d => d['year'] === String(year)).reduce((accu, curr) => accu + Number(curr[column]), 0);
 
                 prepData.push({
                     title: extract[extractData].title,
                     subtitle: extract[extractData].subtitle,
-                    ranges:[q1,median,q3,maxValue],
-                    measures:[value],
-                    markers:[avgValue]
-                })
+                    ranges: [q1, median, q3, maxValue],
+                    measures: [value],
+                    markers: [avgValue]
+                });
             }
 
             return prepData;
         }
 
-        function buildHeatMap(opts, data) {
+        function buildBulletChart(opts, data) {
             var margin = {top: 5, right: 40, bottom: 20, left: 140},
-                width = 960 - margin.left - margin.right,
+                width  = (opts.width || 920) - margin.left - margin.right,
                 height = 50 - margin.top - margin.bottom;
 
-            var chart = d3.bullet()
-                .width(width)
-                .height(height);
+            var chart = d3.bullet().width(width).height(height);
 
             var svg = d3.select(opts.el).selectAll("svg")
                 .data(data)
@@ -83,68 +71,108 @@
                 .style("text-anchor", "end")
                 .attr("transform", "translate(-6," + height / 2 + ")");
 
-            title.append("text")
-                .attr("class", "title")
-                .text(function(d) { return d.title; });
+            title.append("text").attr("class", "title").text(function(d) { return d.title; });
+            title.append("text").attr("class", "subtitle").attr("dy", "1em").text(function(d) { return d.subtitle; });
+        }
 
-            title.append("text")
-                .attr("class", "subtitle")
-                .attr("dy", "1em")
-                .text(function(d) { return d.subtitle; });
+        function getChartSize() {
+            const host = document.querySelector("#my_dataviz");
+            const hostWidth = host ? host.clientWidth : 920;
+            const width = Math.max(500, Math.min(1100, hostWidth - 16));
+            return { width };
         }
 
         function updateGraph(data, year) {
             document.querySelector("#my_dataviz").innerHTML = "";
-            const prepData = preparedData(
-                data,
-                year,
-                [
-                    {"title":"Morts", "subtitle": "Nombre de víctimes mortals", "column": "n_deaths"},
-                    {"title":"Ferits greus","subtitle":"Nombre de ferits greus", "column": "n_wounded_severe"},
-                    {"title":"Ferits lleus","subtitle":"Nombre de ferits lleus", "column": "n_wounded_mild"},
-                    {"title":"Víctimes","subtitle":"Total de víctimes", "column": "n_victims"},
-                    {"title":"Vehicles","subtitle":"Nombre de vehicles implicats", "column": "n_vehicles"}
-                ]
-            )
-            buildHeatMap({
-                el: "#my_dataviz",
-                title: "Accidents per més",
-                subtitle: "Accidents registrats a Barcelona per la Guardia Urbana (2010 - 2021)"
-            }, prepData)
+            const { width } = getChartSize();
+            const prepData = preparedData(data, year, [
+                { title: "Morts",        subtitle: "Nombre de víctimes mortals",  column: "n_deaths" },
+                { title: "Ferits greus", subtitle: "Nombre de ferits greus",      column: "n_wounded_severe" },
+                { title: "Ferits lleus", subtitle: "Nombre de ferits lleus",      column: "n_wounded_mild" },
+                { title: "Víctimes",     subtitle: "Total de víctimes",           column: "n_victims" },
+                { title: "Vehicles",     subtitle: "Nombre de vehicles implicats", column: "n_vehicles" }
+            ]);
+            buildBulletChart({ el: "#my_dataviz", width }, prepData);
         }
     </script>
 </head>
-<body>
-    <a href="index.html">Tornar a l'índex</a>
-    <h1>TÈCNICA GRUP III (Menys habituals o específiques): Bullet Graphs</h1>
-    <!-- Years from 2010 to 2021, default 2021 -->
-    <label for="year_sel">Selecció any:</label>
-    <select id="year_sel" name="year_sel">
-        <option value="2010">2010</option>
-        <option value="2011">2011</option>
-        <option value="2012">2012</option>
-        <option value="2013">2013</option>
-        <option value="2014">2014</option>
-        <option value="2015">2015</option>
-        <option value="2016">2016</option>
-        <option value="2017">2017</option>
-        <option value="2018">2018</option>
-        <option value="2019">2019</option>
-        <option value="2020">2020</option>
-        <option value="2021" selected>2021</option>
-    </select>
-    <div id="my_dataviz"></div>
+<body class="min-h-screen bg-base-200 text-base-content" data-theme="corporate">
+
+    <div class="navbar bg-base-100 shadow-sm px-4 md:px-8">
+        <div class="flex-1">
+            <a class="btn btn-ghost text-lg" href="index.html">← Tornar a l'índex</a>
+        </div>
+        <div class="flex-none">
+            <span class="badge badge-primary badge-lg">PAC2 · D3 + Tailwind + DaisyUI</span>
+        </div>
+    </div>
+
+    <main class="mx-auto max-w-6xl p-4 md:p-8 space-y-6">
+
+        <section class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h1 class="card-title text-2xl md:text-3xl">TÈCNICA GRUP III: Bullet Graphs</h1>
+                <p class="text-base-content/70">Comparativa anual de víctimes i vehicles implicats als accidents de Barcelona (2010 - 2021).</p>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+
+            <aside class="card bg-base-100 shadow lg:col-span-1">
+                <div class="card-body gap-4">
+                    <h2 class="card-title">Selecció d'any</h2>
+                    <div class="form-control w-full">
+                        <label class="label">
+                            <span class="label-text">Any a comparar</span>
+                        </label>
+                        <select id="year_sel" name="year_sel" class="select select-bordered w-full">
+                            <option value="2010">2010</option>
+                            <option value="2011">2011</option>
+                            <option value="2012">2012</option>
+                            <option value="2013">2013</option>
+                            <option value="2014">2014</option>
+                            <option value="2015">2015</option>
+                            <option value="2016">2016</option>
+                            <option value="2017">2017</option>
+                            <option value="2018">2018</option>
+                            <option value="2019">2019</option>
+                            <option value="2020">2020</option>
+                            <option value="2021" selected>2021</option>
+                        </select>
+                    </div>
+                    <div class="alert">
+                        <span>Les barres mostren el valor de l'any seleccionat respecte als quartils i màxim històric.</span>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="card bg-base-100 shadow lg:col-span-3">
+                <div class="card-body">
+                    <div id="my_dataviz" class="w-full overflow-x-auto"></div>
+                </div>
+            </section>
+
+        </section>
+    </main>
 
     <script>
-        d3.csv('./assets/data/accidents_opendata.csv', function(data) {
-            const year = document.getElementsByName("year_sel")[0].value;
-            updateGraph(data, year)
+        var storedData = null;
 
-            document.getElementsByName("year_sel")[0].addEventListener("change", (event) => {
-                const year = event.target.value;
-                updateGraph(data, year)
-            })
+        d3.csv('./assets/data/accidents_opendata.csv', function(data) {
+            storedData = data;
+            const year = document.getElementById("year_sel").value;
+            updateGraph(storedData, year);
+
+            document.getElementById("year_sel").addEventListener("change", function(event) {
+                updateGraph(storedData, event.target.value);
+            });
+
+            window.addEventListener("resize", () => {
+                const year = document.getElementById("year_sel").value;
+                updateGraph(storedData, year);
+            });
         });
     </script>
 </body>
 </html>
+

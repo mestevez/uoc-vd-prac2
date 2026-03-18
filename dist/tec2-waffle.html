@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VD PAC2 (Waffle Chart)</title>
     <script src="./assets/lib/d3.v4.js"></script>
+    <script src="./assets/lib/tailwindcss.3.4.17.js"></script>
+    <link href="./assets/lib/styles/daisyui.4.12.24.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="./assets/styles/shared.css">
 
     <style>
-        .view-model-selector {
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
+        #my_dataviz {
+            min-height: 620px;
         }
     </style>
 
@@ -40,9 +42,9 @@
 
                 for (let y = 9; y >= 0; y--) {
                     for (let x = 0; x < 10; x ++) {
-                        if (curr > accu && index < max) {
+                        if (curr > accu && index < max - 1) {
                             let r = Math.round(data[++index].ratio);
-                            while(r === 0 && index < max) {
+                            while(r === 0 && index < max - 1) {
                                 r = Math.round(data[++index].ratio);
                             }
                             accu += r;
@@ -193,7 +195,7 @@
             if (whole) {
                 cells.append("title").text(d => {
                     const cd = data[d.index];
-                    return `${cd.month_name}\n${d.count} (${cd.ratio.toFixed(1)}%)`;
+                    return `${cd.month_name}\n${cd.count} (${cd.ratio.toFixed(1)}%)`;
                 });
 
                 cells.transition()
@@ -219,15 +221,24 @@
             }
         }
 
+        function getChartSize() {
+            const host = document.querySelector("#my_dataviz");
+            const hostWidth = host ? host.clientWidth : 700;
+            const width = Math.max(520, Math.min(980, hostWidth - 24));
+            const height = width < 720 ? 560 : 620;
+            return { width, height };
+        }
+
         function updateGraph(data, view_mode) {
             document.querySelector("#my_dataviz").innerHTML = "";
+            const chartSize = getChartSize();
             buildHeatMap(
                 {
                     el: '#my_dataviz',
                     color: "#4285f4",
-                    width: 700,
-                    height: 600,
-                    title: "Accidents per més",
+                    width: chartSize.width,
+                    height: chartSize.height,
+                    title: "Accidents per mes",
                     subtitle: "Accidents registrats a Barcelona per la Guardia Urbana (2010 - 2021)",
                     shape: 'circle', // rect / circle
                     whole : view_mode === 'whole'
@@ -237,16 +248,51 @@
         }
     </script>
 </head>
-<body>
-    <a href="index.html">Tornar a l'índex</a>
-    <h1>TÈCNICA GRUP II (Habituals i específiques): Waffle Chart</h1>
-    <span class="view-model-selector">
-        <input type="radio" id="split" name="view_mode" value="split" checked>
-        <label for="split">Split</label><br>
-        <input type="radio" id="whole" name="view_mode" value="whole">
-        <label for="whole">Whole</label><br>
-    </span>
-    <div id="my_dataviz"></div>
+<body class="min-h-screen bg-base-200 text-base-content" data-theme="corporate">
+    <div class="navbar bg-base-100 shadow-sm px-4 md:px-8">
+        <div class="flex-1">
+            <a class="btn btn-ghost text-lg" href="index.html">← Tornar a l'índex</a>
+        </div>
+        <div class="flex-none">
+            <span class="badge badge-primary badge-lg">PAC2 · D3 + Tailwind + DaisyUI</span>
+        </div>
+    </div>
+
+    <main class="mx-auto max-w-6xl p-4 md:p-8 space-y-6">
+        <section class="card bg-base-100 shadow">
+            <div class="card-body">
+                <h1 class="card-title text-2xl md:text-3xl">TÈCNICA GRUP II: Waffle Chart</h1>
+                <p class="text-base-content/70">Distribució mensual dels accidents registrats a Barcelona (2010 - 2021).</p>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            <aside class="card bg-base-100 shadow lg:col-span-1">
+                <div class="card-body gap-4">
+                    <h2 class="card-title">Mode de visualització</h2>
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="radio" class="radio radio-primary" id="split" name="view_mode" value="split" checked>
+                            <span class="label-text">Split</span>
+                        </label>
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="radio" class="radio radio-primary" id="whole" name="view_mode" value="whole">
+                            <span class="label-text">Whole</span>
+                        </label>
+                    </div>
+                    <div class="alert">
+                        <span>Canvia el mode per comparar pesos mensuals o veure la distribució total.</span>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="card bg-base-100 shadow lg:col-span-2">
+                <div class="card-body">
+                    <div id="my_dataviz" class="w-full overflow-x-auto"></div>
+                </div>
+            </section>
+        </section>
+    </main>
 
     <script>
         d3.csv('./assets/data/accidents_opendata.csv', function(data) {
@@ -261,6 +307,11 @@
                 const vm = e.target.value;
                 updateGraph(prepData, vm);
             }));
+
+            window.addEventListener("resize", () => {
+                const vm = document.querySelector("[name=view_mode]:checked").value;
+                updateGraph(prepData, vm);
+            });
         });
     </script>
 </body>

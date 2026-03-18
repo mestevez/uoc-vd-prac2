@@ -1,14 +1,82 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ca">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VD PAC2 — Visualització de Dades</title>
+    <script src="./assets/lib/tailwindcss.3.4.17.js"></script>
+    <link href="./assets/lib/styles/daisyui.4.12.24.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="./assets/styles/shared.css">
 </head>
-<body>
-    <ul>
-        <li><a href="tec1-heatmap.html">TÈCNICA GRUP I (Bàsiques i populars): 116- Heatmap</a></li>
-        <li><a href="tec2-waffle.html">TÈCNICA GRUP II (Habituals i específiques): Waffle Chart</a></li>
-        <li><a href="tec3-bullet.html">TÈCNICA GRUP III (Menys habituals o específiques): Bullet Graphs</a></li>
-    </ul>
+<body class="min-h-screen bg-base-200 text-base-content" data-theme="corporate">
+
+    <div class="navbar bg-base-100 shadow-sm px-4 md:px-8">
+        <div class="flex-1">
+            <span class="text-xl font-bold tracking-tight">VD PAC2</span>
+        </div>
+        <div class="flex-none">
+            <span class="badge badge-primary badge-lg">D3 + Tailwind + DaisyUI</span>
+        </div>
+    </div>
+
+    <main class="mx-auto max-w-5xl p-4 md:p-8 space-y-8">
+
+        <section class="hero bg-base-100 rounded-2xl shadow py-12 px-6">
+            <div class="hero-content text-center">
+                <div>
+                    <h1 class="text-4xl font-bold">Visualització de Dades</h1>
+                    <p class="py-4 text-base-content/70 max-w-xl mx-auto">
+                        Anàlisi dels accidents registrats a Barcelona per la Guàrdia Urbana
+                        (2010 – 2021) mitjançant tres tècniques de visualització.
+                    </p>
+                    <div class="badge badge-outline">UOC · PAC2</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="card bg-base-100 shadow hover:shadow-lg transition-shadow">
+                <div class="card-body">
+                    <div class="badge badge-secondary mb-2">Grup I · Bàsiques i populars</div>
+                    <h2 class="card-title">Heatmap</h2>
+                    <p class="text-base-content/70 text-sm flex-1">
+                        Distribució d'accidents per hora del dia i dia de la setmana.
+                    </p>
+                    <div class="card-actions justify-end mt-4">
+                        <a href="tec1-heatmap.html" class="btn btn-primary btn-sm">Veure →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow hover:shadow-lg transition-shadow">
+                <div class="card-body">
+                    <div class="badge badge-secondary mb-2">Grup II · Habituals i específiques</div>
+                    <h2 class="card-title">Waffle Chart</h2>
+                    <p class="text-base-content/70 text-sm flex-1">
+                        Proporció mensual dels accidents en format waffle interactiu.
+                    </p>
+                    <div class="card-actions justify-end mt-4">
+                        <a href="tec2-waffle.html" class="btn btn-primary btn-sm">Veure →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow hover:shadow-lg transition-shadow">
+                <div class="card-body">
+                    <div class="badge badge-secondary mb-2">Grup III · Menys habituals</div>
+                    <h2 class="card-title">Bullet Graphs</h2>
+                    <p class="text-base-content/70 text-sm flex-1">
+                        Comparativa anual de víctimes i vehicles implicats per any seleccionat.
+                    </p>
+                    <div class="card-actions justify-end mt-4">
+                        <a href="tec3-bullet.html" class="btn btn-primary btn-sm">Veure →</a>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
 </body>
 </html>
