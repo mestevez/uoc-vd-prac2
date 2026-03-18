@@ -40,11 +40,11 @@
                     w1 = bulletWidth(x1);
 
                 // Update the range rects.
-                var range = g.selectAll("rect.range")
+                var range = g.selectAll("rect.bullet-range")
                     .data(rangez);
 
                 range.enter().append("rect")
-                    .attr("class", function(d, i) { return "range s" + i; })
+                    .attr("class", function(d, i) { return "bullet-range s" + i; })
                     .attr("width", w0)
                     .attr("height", height)
                     .attr("x", reverse ? x0 : 0)
