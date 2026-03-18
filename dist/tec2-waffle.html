@@ -2,10 +2,220 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>VD PAC2 (Waffle Chart)</title>
+    <script src="./assets/lib/d3.v4.js"></script>
+
+    <script>
+        function preparedData(data, myGroups) {
+            var prepData = [];
+
+            for (var groupIndex = 0; groupIndex < myGroups.length; groupIndex++) {
+                var value = data.filter(function(d) {
+                    return d['month_name'] === myGroups[groupIndex]
+                }).length;
+
+                prepData.push({
+                    month_name: myGroups[groupIndex],
+                    count: value
+                })
+            }
+
+            return prepData;
+        }
+
+        function calculateWaffles(data, whole) {
+            const waffles = [];
+            if (whole) {
+                const max = data.length;
+                let index = 0, curr = 1,
+                    accu = Math.round(data[0].ratio), waffle = [];
+
+                for (let y = 9; y >= 0; y--) {
+                    for (let x = 0; x < 10; x ++) {
+                        if (curr > accu && index < max) {
+                            let r = Math.round(data[++index].ratio);
+                            while(r === 0 && index < max) {
+                                r = Math.round(data[++index].ratio);
+                            }
+                            accu += r;
+                        }
+                        waffle.push({x, y, index});
+                        curr++;
+                    }
+
+                }
+                waffles.push(waffle);
+            } else {
+                data.map((d, i) => {
+                    let curr = 0, waffle = [];
+                    for (let y = 9; y >= 0; y--)
+                        for(let x = 0; x < 10; x ++) {
+                            waffle.push(({x, y, index: curr < Math.round(d.ratio) ? i : -1}));
+                            curr++;
+                        }
+                    waffles.push(waffle);
+                });
+            }
+
+            return waffles;
+        }
+
+        function drawLegend(chartData, waffleSize, color, svg, cells) {
+            const legend = svg.selectAll(".legend")
+                .data(chartData.map(d => d.month_name))
+                .enter()
+                .append("g")
+                .attr("opacity", 1)
+                .attr("transform", (d, i) => `translate(${waffleSize + 20},${i * 30})`)
+                .on("mouseover", highlight)
+                .on("mouseout", restore);
+
+            legend.append("rect")
+                .attr("rx", 3).attr("ry", 3)
+                .attr("width", 30).attr("height", 20)
+                .attr("fill", (d, i) => color(i));
+
+            legend.append("text")
+                .attr("dx", 40)
+                .attr("alignment-baseline", "hanging")
+                .text((d, i) => `${d} (${chartData[i].ratio.toFixed(1)}%)`);
+
+            function highlight(d, i) {
+                cells.transition().duration(500)
+                    .attr("fill", function(d) { return d.index === i ? color(d.index) : "#ccc"; });
+            }
+
+            function restore() {
+                cells.transition().duration(500).attr("fill", d => color(d.index))
+            }
+        }
+
+        function buildHeatMap(opts, data) {
+            var margin = {top: 80, right: 30, bottom: 30, left: 30},
+                width = opts.width - margin.left - margin.right,
+                height = opts.height - margin.top - margin.bottom;
+
+            const isRect = true;
+            const whole = false;
+            const waffleSize = 150;
+            const padding = ({x: 10, y: 40});
+
+            const total = data.reduce((a, b) => a + Math.abs(b.count), 0);
+            data = data.map(d => ({
+                month_name: d.month_name,
+                count: d.count,
+                ratio: d.count / total * 100
+            }));
+
+            const waffles = calculateWaffles(data, whole);
+
+            const sequence = (length) => Array.apply(null, {length: length}).map((d, i) => i);
+
+            const color = d3.scaleOrdinal(d3.schemeCategory10)
+                .domain(sequence(data.length))
+
+            const scale = d3.scaleBand()
+                .domain(sequence(10))
+                .range([0, waffleSize])
+                .padding(0.1)
+
+            var svg = d3.select(opts.el)
+                .append("svg")
+                .style("cursor", "default")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom);
+
+            const g = svg.selectAll(".waffle")
+                .data(waffles)
+                .enter()
+                .append("g")
+                .attr("class", "waffle");
+
+            if (!whole) {
+                const numPerRow = Math.floor(width / (waffleSize + padding.x));
+                g.attr("transform", (d, i) => {
+                    const r = Math.floor(i / numPerRow);
+                    const c = i - r * numPerRow;
+                    return `translate(${c * (waffleSize + padding.x)},${r * (waffleSize + padding.y)})`
+                });
+            }
+
+            const cellSize = scale.bandwidth();
+            const half = cellSize / 2;
+            const cells = g.append("g")
+                .selectAll(opts.shape)
+                .data(d => d)
+                .enter()
+                .append(opts.shape)
+                .attr("fill", d => d.index === -1 ? "#ddd" : color(d.index));
+
+            if (isRect) {
+                cells.attr("x", d => scale(d.x))
+                    .attr("y", d => whole ?  0 : scale(d.y))
+                    .attr("rx", 3).attr("ry", 3)
+                    .attr("width", cellSize).attr("height", cellSize)
+            }
+            else {
+                cells.attr("cx", d => scale(d.x) + half)
+                    .attr("cy", d => whole ? 0 : scale(d.y) + half)
+                    .attr("r", half);
+            }
+
+            if (whole) {
+                cells.append("title").text(d => {
+                    const cd = data[d.index];
+                    return `${cd.month_name}\n${d.count} (${cd.ratio.toFixed(1)}%)`;
+                });
+
+                cells.transition()
+                    .duration(d => d.y * 100)
+                    .ease(d3.easeBounce)
+                    .attr(isRect ? "y" : "cy", d => scale(d.y) + (isRect ? 0 : half));
+                svg.transition().delay(550)
+                    .on("end", () => drawLegend(data, waffleSize, color, svg, cells));
+            }
+            else {
+                g.append("text")
+                    .style("font-size", 20)
+                    .style("font-weight", "bold")
+                    .attr("dy", "1.5em")
+                    .attr("text-anchor", "middle")
+                    .attr("fill", (d, i) => color(i))
+                    .attr("transform", `translate(${waffleSize / 2},0)`)
+                    .text((d, i) => `${data[i].ratio.toFixed(0)}%`);
+
+                g.append("g")
+                    .attr("transform", `translate(0,${waffleSize + padding.y / 2.5})`)
+                    .call(g => g.append("text").text((d, i) => data[i].month_name))
+                    .call(g => g.append("text").attr("dy", "1em").text((d, i) => data[i].count));
+            }
+        }
+    </script>
 </head>
 <body>
     <a href="index.html">Tornar a l'índex</a>
     <h1>TÈCNICA GRUP II (Habituals i específiques): Waffle Chart</h1>
+    <div id="my_dataviz">
+    </div>
+
+    <script>
+        d3.csv('./assets/data/accidents_opendata.csv', function(data) {
+            var myGroups = ["Gener", "Febrer", "Març", "Abril", "Maig", "Juny", "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"];
+            var prepData = preparedData(data, myGroups);
+
+            buildHeatMap(
+                {
+                    el: '#my_dataviz',
+                    color: "#4285f4",
+                    width: 700,
+                    height: 600,
+                    title: "Accidents per hora i dia de la setmana",
+                    subtitle: "Accidents registrats a Barcelona per la Guardia Urbana (2010 - 2021)",
+                    shape: 'rect' // rect / circle
+                },
+                prepData
+            );
+        });
+    </script>
 </body>
 </html>
