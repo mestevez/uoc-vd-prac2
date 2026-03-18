@@ -218,20 +218,7 @@
                     .call(g => g.append("text").attr("dy", "1em").text((d, i) => data[i].count));
             }
         }
-    </script>
-</head>
-<body>
-    <a href="index.html">Tornar a l'índex</a>
-    <h1>TÈCNICA GRUP II (Habituals i específiques): Waffle Chart</h1>
-    <span class="view-model-selector">
-        <input type="radio" id="split" name="view_mode" value="split" checked>
-        <label for="split">Split</label><br>
-        <input type="radio" id="whole" name="view_mode" value="whole">
-        <label for="whole">Whole</label><br>
-    </span>
-    <div id="my_dataviz"></div>
 
-    <script>
         function updateGraph(data, view_mode) {
             document.querySelector("#my_dataviz").innerHTML = "";
             buildHeatMap(
@@ -248,6 +235,20 @@
                 data
             );
         }
+    </script>
+</head>
+<body>
+    <a href="index.html">Tornar a l'índex</a>
+    <h1>TÈCNICA GRUP II (Habituals i específiques): Waffle Chart</h1>
+    <span class="view-model-selector">
+        <input type="radio" id="split" name="view_mode" value="split" checked>
+        <label for="split">Split</label><br>
+        <input type="radio" id="whole" name="view_mode" value="whole">
+        <label for="whole">Whole</label><br>
+    </span>
+    <div id="my_dataviz"></div>
+
+    <script>
         d3.csv('./assets/data/accidents_opendata.csv', function(data) {
             var prepData = preparedData(
                 data,
