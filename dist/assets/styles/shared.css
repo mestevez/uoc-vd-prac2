@@ -43,6 +43,12 @@
     z-index: 20;
 }
 
+/* ── D3 heatmap texts ── */
+.heatmap text {
+    font: 12px sans-serif;
+    font-weight: bold;
+}
+
 /* ── Bullet chart SVG styles (tec3-bullet) ── */
 .bullet { font: 10px sans-serif; }
 .bullet .marker { stroke: #263238; stroke-width: 2px; }
@@ -51,8 +57,8 @@
 .bullet .bullet-range.s1 { fill: #ddd; }
 .bullet .bullet-range.s2 { fill: #ccd1d6; }
 .bullet .bullet-range.s3 { fill: #acb4bc; }
-.bullet .measure.s0 { fill: #b0a2e4; }
-.bullet .measure.s1 { fill: #855cf8; }
+.bullet .measure.s0 { fill: #7C9EDD; }
+.bullet .measure.s1 { fill: #7CCEDD; }
 .bullet .title { font-size: 14px; font-weight: bold; }
 .bullet .subtitle { fill: #999; }
 

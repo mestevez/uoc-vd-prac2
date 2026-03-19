@@ -9,12 +9,6 @@
     <link href="./assets/lib/styles/daisyui.4.12.24.min.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="./assets/styles/shared.css">
 
-    <style>
-        #my_dataviz {
-            min-height: 620px;
-        }
-    </style>
-
     <script>
         function preparedData(data, myGroups) {
             var prepData = [];
@@ -101,7 +95,7 @@
         }
 
         function buildHeatMap(opts, data) {
-            var margin = {top: 80, right: 30, bottom: 30, left: 30},
+            var margin = opts.margin,
                 width = opts.width - margin.left - margin.right,
                 height = opts.height - margin.top - margin.bottom;
 
@@ -221,25 +215,16 @@
             }
         }
 
-        function getChartSize() {
-            const host = document.querySelector("#my_dataviz");
-            const hostWidth = host ? host.clientWidth : 700;
-            const width = Math.max(520, Math.min(980, hostWidth - 24));
-            const height = width < 720 ? 560 : 620;
-            return { width, height };
-        }
-
         function updateGraph(data, view_mode) {
             document.querySelector("#my_dataviz").innerHTML = "";
-            const chartSize = getChartSize();
+
             buildHeatMap(
                 {
                     el: '#my_dataviz',
                     color: "#4285f4",
-                    width: chartSize.width,
-                    height: chartSize.height,
-                    title: "Accidents per mes",
-                    subtitle: "Accidents registrats a Barcelona per la Guardia Urbana (2010 - 2021)",
+                    width: 650,
+                    height: 500,
+                    margin: { top: 0, right: 30, bottom: 30, left: 30 },
                     shape: 'circle', // rect / circle
                     whole : view_mode === 'whole'
                 },
@@ -285,7 +270,9 @@
 
             <section class="card bg-base-100 shadow lg:col-span-2">
                 <div class="card-body">
-                    <div id="my_dataviz" class="w-full overflow-x-auto"></div>
+                    <div id="my_dataviz" class="w-full">
+                        Carregant visualització...
+                    </div>
                 </div>
             </section>
         </section>
