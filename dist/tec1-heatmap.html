@@ -100,8 +100,8 @@
                 {
                     el: '#my_dataviz',
                     color: "#7C9EDD",
-                    width: 700,
-                    height: 550,
+                    width: 600,
+                    height: 500,
                     margin: {top: 30, right: 30, bottom: 0, left: 50}
                 },
                 prepData
@@ -126,12 +126,32 @@
             </div>
         </section>
 
-        <section class="card bg-base-100 shadow">
-            <div class="card-body">
-                <div id="my_dataviz" class="w-full heatmap">
-                    Carregant visualització...
-                </div>
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            <div class="lg:col-span-1 flex flex-col gap-6">
+                <aside class="card bg-base-100 shadow">
+                    <div class="card-body gap-3">
+                        <h2 class="card-title text-base">Mencions</h2>
+                        <ul class="text-sm flex flex-wrap gap-x-8 gap-y-2">
+                            <li>
+                                <span class="font-semibold">Font de dades:</span>
+                                <a class="link link-primary ml-1" href="https://www.kaggle.com/datasets/emmanuelfwerr/barcelona-car-accidents?select=accidents_opendata.csv" target="_blank">Kaggle – Barcelona Car Accidents</a>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Llibreria:</span>
+                                <a class="link link-primary ml-1" href="https://d3js.org" target="_blank">D3.js</a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
             </div>
+
+            <section class="card bg-base-100 shadow lg:col-span-2">
+                <div class="card-body">
+                    <div id="my_dataviz" class="w-full heatmap">
+                        Carregant visualització...
+                    </div>
+                </div>
+            </section>
         </section>
 
     </main>

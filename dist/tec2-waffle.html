@@ -249,24 +249,47 @@
         </section>
 
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            <aside class="card bg-base-100 shadow lg:col-span-1">
-                <div class="card-body gap-4">
-                    <h2 class="card-title">Mode de visualització</h2>
-                    <div class="form-control">
-                        <label class="label cursor-pointer justify-start gap-3">
-                            <input type="radio" class="radio radio-primary" id="split" name="view_mode" value="split" checked>
-                            <span class="label-text">Split</span>
-                        </label>
-                        <label class="label cursor-pointer justify-start gap-3">
-                            <input type="radio" class="radio radio-primary" id="whole" name="view_mode" value="whole">
-                            <span class="label-text">Whole</span>
-                        </label>
+            <div class="lg:col-span-1 flex flex-col gap-6">
+                <aside class="card bg-base-100 shadow">
+                    <div class="card-body gap-4">
+                        <h2 class="card-title">Mode de visualització</h2>
+                        <div class="form-control">
+                            <label class="label cursor-pointer justify-start gap-3">
+                                <input type="radio" class="radio radio-primary" id="split" name="view_mode" value="split" checked>
+                                <span class="label-text">Split</span>
+                            </label>
+                            <label class="label cursor-pointer justify-start gap-3">
+                                <input type="radio" class="radio radio-primary" id="whole" name="view_mode" value="whole">
+                                <span class="label-text">Whole</span>
+                            </label>
+                        </div>
+                        <div class="alert">
+                            <span>Canvia el mode per comparar pesos mensuals o veure la distribució total.</span>
+                        </div>
                     </div>
-                    <div class="alert">
-                        <span>Canvia el mode per comparar pesos mensuals o veure la distribució total.</span>
+                </aside>
+
+                <aside class="card bg-base-100 shadow">
+                    <div class="card-body gap-3">
+                        <h2 class="card-title text-base">Mencions</h2>
+
+                        <ul class="text-sm space-y-2">
+                            <li>
+                                <span class="font-semibold">Font de dades:</span><br>
+                                <a class="link link-primary break-all" href="https://www.kaggle.com/datasets/emmanuelfwerr/barcelona-car-accidents?select=accidents_opendata.csv" target="_blank">Kaggle – Barcelona Car Accidents</a>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Llibreria:</span><br>
+                                <a class="link link-primary" href="https://d3js.org" target="_blank">D3.js</a>
+                            </li>
+                            <li>
+                                <span class="font-semibold">Referència Waffle:</span><br>
+                                <a class="link link-primary break-all" href="https://observablehq.com/@analyzer2004/waffle-chart" target="_blank">@analyzer2004 / waffle-chart</a>
+                            </li>
+                        </ul>
                     </div>
-                </div>
-            </aside>
+                </aside>
+            </div>
 
             <section class="card bg-base-100 shadow lg:col-span-2">
                 <div class="card-body">
