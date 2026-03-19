@@ -1,5 +1,31 @@
 /* ── Shared styles · UOC VD PAC2 ── */
 
+/* ── DaisyUI color overrides ──────────────────────────────────────────────
+ * Despite the filename saying "4.12.24", this build uses DaisyUI v3's
+ * variable system: SHORT names with raw oklch L C H values (no oklch() wrapper).
+ * Components consume them as: oklch(var(--s) / 1)
+ *
+ * Short variable reference:
+ *   --p  / --pc   primary / primary-content
+ *   --s  / --sc   secondary / secondary-content
+ *   --a  / --ac   accent / accent-content
+ *   --n  / --nc   neutral / neutral-content
+ *   --b1 / --b2 / --b3 / --bc   base colors / base-content
+ *   --in / --inc  info / info-content
+ *   --su / --suc  success / success-content
+ *   --wa / --wac  warning / warning-content
+ *   --er / --erc  error / error-content
+ *
+ * Format: --s: <lightness%> <chroma> <hue>;   ← NO oklch() wrapper!
+ * Use https://oklch.com to pick a color and copy only the three values.
+ * ───────────────────────────────────────────────────────────────────────── */
+[data-theme="corporate"] {
+    /* Example: change secondary to a violet tone */
+    --p:  70% 0.1 262;    /* affects .badge-secondary, .btn-secondary … */
+    --s:  64% 0.14 289;    /* affects .badge-secondary, .btn-secondary … */
+    --sc: 98% 0.01 290;    /* text/icon colour on top of secondary */
+}
+
 /* D3 chart container: needs position:relative for absolute-positioned tooltips */
 #my_dataviz {
     position: relative;
