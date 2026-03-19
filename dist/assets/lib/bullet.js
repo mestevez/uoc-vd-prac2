@@ -81,6 +81,32 @@
                     .attr("x", reverse ? x1 : 0)
                     .attr("y", height / 3);
 
+                // Value label at the right tip of the measure bar.
+                var fmt = tickFormat || d3.format(",");
+                var measureLabel = g.selectAll("text.measure-label")
+                    .data(measurez);
+
+                measureLabel.enter().append("text")
+                    .attr("class", "measure-label")
+                    .attr("x", function(d) { return x0(d) + 4; })
+                    .attr("y", height / 2)
+                    .attr("dy", "0.35em")
+                    .style("font-size", "10px")
+                    .style("font-weight", "bold")
+                    .style("fill", "#333")
+                    .text(function(d) { return fmt(d); })
+                    .transition()
+                    .duration(duration)
+                    .attr("x", function(d) { return x1(d) + 4; });
+
+                measureLabel.transition()
+                    .duration(duration)
+                    .attr("x", function(d) { return x1(d) + 4; })
+                    .attr("y", height / 2)
+                    .text(function(d) { return fmt(d); });
+
+                measureLabel.exit().remove();
+
                 // Update the marker lines.
                 var marker = g.selectAll("line.marker")
                     .data(markerz);

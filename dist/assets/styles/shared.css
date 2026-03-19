@@ -49,6 +49,16 @@
     font-weight: bold;
 }
 
+/* ── D3 waffle texts ── */
+.waffle .title {
+    font: 14px sans-serif;
+    font-weight: bold;
+}
+.waffle .subtitle {
+    font: 12px sans-serif;
+    color: #999;
+}
+
 /* ── Bullet chart SVG styles (tec3-bullet) ── */
 .bullet { font: 10px sans-serif; }
 .bullet .marker { stroke: #263238; stroke-width: 2px; }

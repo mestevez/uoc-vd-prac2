@@ -210,8 +210,8 @@
 
                 g.append("g")
                     .attr("transform", `translate(${waffleSize / 3},${waffleSize + padding.y / 2.5})`)
-                    .call(g => g.append("text").text((d, i) => data[i].month_name))
-                    .call(g => g.append("text").attr("dy", "1em").text((d, i) => data[i].count));
+                    .call(g => g.append("text").attr("class", "title").text((d, i) => data[i].month_name))
+                    .call(g => g.append("text").attr("class", "subtitle").attr("dy", "1em").text((d, i) => ("(" + data[i].count) + ")"));
             }
         }
 
